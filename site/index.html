@@ -84,9 +84,10 @@ function show(tab,path){
   cur=tab;document.querySelectorAll(".tabs a[data-tab]").forEach(a=>a.classList.toggle("on",a.dataset.tab===tab));
   $("#desc").textContent=APPS[tab].desc;
   for(const k of ["keying","forager"]){const f=document.getElementById("f-"+k);const on=k===tab;f.hidden=!on;
-    if(on){const want=APPS[k].base+(path||"/");const sep=want.includes("?")?"&":"?";
-      if(!f.dataset.loaded){f.src=want+sep+"embed=1";f.dataset.loaded="1"}
-      else{try{const cp=f.contentWindow.location.pathname+f.contentWindow.location.search.replace(/[?&]embed=1/,"").replace(/^&/,"?");if(path&&path!=="/"&&cp!==want)f.contentWindow.location.href=want+sep+"embed=1"}catch(e){}}}}
+    if(on){const want=APPS[k].base+(path||"/");
+      const emb=u=>{const i=u.indexOf("#");const base=i<0?u:u.slice(0,i),hash=i<0?"":u.slice(i);return base+(base.includes("?")?"&":"?")+"embed=1"+hash};
+      if(!f.dataset.loaded){f.src=emb(want);f.dataset.loaded="1"}
+      else{try{const L=f.contentWindow.location;const cp=L.pathname+L.search.replace(/[?&]embed=1/,"").replace(/^&/,"?")+L.hash;if(path&&path!=="/"&&cp!==want)L.href=emb(want)}catch(e){}}}}
   $("#host").hidden=tab!=="host";
   $("#ext").innerHTML=tab==="host"?"":`<a href="${APPS[tab].base}/?embed=0" target="_blank" rel="noopener">open ${esc(APPS[tab].name)} on its own ↗</a>`;
   if(tab==="host")tickHost();
