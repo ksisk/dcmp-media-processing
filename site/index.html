@@ -115,7 +115,8 @@ async function loadLive(){try{const L=await j("/keying/api/live");const el=$("#l
   const seen=new Set(tp.map(x=>x.n));(s.temps||[]).forEach(x=>{if(["coretemp","k10temp","zenpower","x86_pkg_temp","cpu_thermal"].includes(x.chip)&&s.cpu_temp!=null)return;const n=`${x.chip} ${x.label}`.replace(/^thermal /,"");if(!seen.has(n)){seen.add(n);tp.push({n,t:x.temp})}});
   if(tp.length)h+=`<div class="lc"><div class="k"><b>Temperatures</b><span>system · CPU · GPU</span></div><div class="temps">${tp.map(x=>`<div class="tr"><span class="tn" title="${esc(x.n)}">${esc(x.n)}</span><div class="bar ${x.t>=80?"hot":""}"><i style="width:${Math.max(0,Math.min(100,x.t))}%"></i></div><span class="tv">${x.t.toFixed(0)} °C</span></div>`).join("")}</div></div>`;
   el.innerHTML=h}catch(e){$("#live").innerHTML=`<div class="empty">keying pipeline not reachable (${esc(e.message)})</div>`}}
-async function loadForager(){try{const r=await j("/forager/api/jobs?view=queue&page=1&per=50");foragerJobs=r.jobs||r.items||(Array.isArray(r)?r:[]);foragerAuth=true}catch(e){if(e.auth){foragerAuth=false}foragerJobs=null}}
+let foragerCounts=null;
+async function loadForager(){try{const r=await j("/forager/api/jobs?view=queue&page=1&per=50");foragerJobs=r.jobs||[];foragerCounts=r.counts||null;foragerAuth=true}catch(e){if(e.auth){foragerAuth=false}foragerJobs=null;foragerCounts=null}}
 async function loadKeying(){try{const r=await j("/keying/api/jobs");keyingJobs=r.jobs||[];var queued=r.queued||[]}catch(e){keyingJobs=null}
   return queued||[]}
 function stageName(st){return{download:"Downloading",analyse:"Measuring loudness",pass1:"Video pass 1",pass2:"Encoding",deliver:"Delivering"}[st]||"Working"}
@@ -128,9 +129,9 @@ async function loadGpus(){try{const G=await j("/keying/api/gpus");const el=$("#g
     if(g.index===FORAGER_GPU&&!foragerAuth)who.push(`<span class="t">forager: sign in on the Forager tab to see its jobs</span>`);
     return`<tr><td>${g.index}</td><td class="l">${esc(g.short)} <span class="t" style="font-size:11px">${esc(g.uuid)}</span></td><td>${g.util==null?"–":g.util+"%"}</td><td>${g.mem_used==null?"–":`${(g.mem_used/1024).toFixed(1)} / ${(g.mem_total/1024).toFixed(0)} GB`}</td><td>${g.power==null?"–":g.power.toFixed(0)+" W"}</td><td>${g.temp==null?"–":g.temp.toFixed(0)+" °C"}</td><td class="l">${who.length?who.join(""):`<span class="t">idle</span>`}</td></tr>`}).join("")}</tbody>`}catch(e){$("#gpus").innerHTML=`<tbody><tr><td class="t">keying pipeline not reachable</td></tr></tbody>`}}
 function renderApps(queued){const kj=keyingJobs||[];const run=kj.filter(x=>x.state==="running").length,wait=kj.filter(x=>["waiting","decision"].includes(x.state)).length,rev=kj.filter(x=>x.state==="review").length;
-  const fj=foragerJobs;const frun=fj?fj.filter(x=>x.status==="running").length:null,fq=fj?fj.filter(x=>x.status==="queued").length:null;
+  const fj=foragerJobs;const frun=fj?fj.filter(x=>x.status==="running").length:null,fq=fj?(foragerCounts&&foragerCounts.queue!=null?foragerCounts.queue-frun:fj.filter(x=>x.status==="queued").length):null;
   $("#apps").innerHTML=`<div class="ac"><b>Keying pipeline</b><div class="s">${keyingJobs?`${run} running · ${queued.length} queued · ${wait} waiting · ${rev} to review`:"not reachable"}</div><div class="n">${keyingJobs?run:"–"}<small>keying now</small></div><a href="#keying">Open Keying →</a></div>
-    <div class="ac"><b>Media Forager</b><div class="s">${fj?`${frun} working · ${fq} queued`:foragerAuth?"not reachable":"sign in on the Forager tab to see its queue"}</div><div class="n">${fj?frun:"–"}<small>downloading or encoding</small></div><a href="#forager">Open Forager →</a></div>`}
+    <div class="ac"><b>DCMP Media Forager</b><div class="s">${fj?`${frun} working · ${fq} queued`:foragerAuth?"not reachable":"sign in on the Forager tab to see its queue"}</div><div class="n">${fj?frun:"–"}<small>downloading or encoding</small></div><a href="#forager">Open Forager →</a></div>`}
 let hostTimer=null;
 async function tickHost(){if($("#host").hidden)return;const q=await loadKeying();await loadForager();renderApps(q);await Promise.all([loadLive(),loadGpus()]);clearTimeout(hostTimer);hostTimer=setTimeout(tickHost,2000)}
 const h0=parseHash();show(h0.tab,h0.path);
