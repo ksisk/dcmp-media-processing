@@ -1,4 +1,5 @@
-# DCMP Media portal: Caddy serves the shell (site/) and proxies the two apps.
+# DCMP Media portal + GPU broker: Caddy serves the shell (site/) and proxies the two apps; the broker decides
+# which card every GPU job runs on (broker/broker.py) and samples the host for the Host tab.
 #   cp .env.example .env   # upstream addresses
 #   docker compose up -d
 services:
@@ -14,6 +15,35 @@ services:
       - ./site:/srv:ro
       - caddy_data:/data
       - caddy_config:/config
+  broker:
+    image: python:3.12-slim
+    container_name: dcmp-gpu-broker
+    restart: unless-stopped
+    command: ["python3", "-u", "/app/broker.py"]
+    environment:
+      TZ: ${TZ:-America/Los_Angeles}             # schedule windows in the policy are in this zone
+      DATA_DIR: /data
+      BROKER_PORT: "8090"
+      LD_LIBRARY_PATH: /usr/local/lib
+    ports:
+      - "${BROKER_PORT:-8090}:8090"              # apps call the broker directly (also reachable as /host/api/* through Caddy)
+    volumes:
+      - ./broker:/app:ro
+      - broker_data:/data                        # policy.json + leases.json
+      # nvidia-smi and its library, copied from the driver on the host (see README "GPU broker"); no CUDA runtime needed
+      - ${NVIDIA_SMI:-/opt/nvidia/bin/nvidia-smi}:/usr/local/bin/nvidia-smi:ro
+      - ${NVIDIA_ML:-/opt/nvidia/lib/libnvidia-ml.so.1}:/usr/local/lib/libnvidia-ml.so.1:ro
+      # the device nodes (bind-mounted rather than `devices:` — docker cannot write device cgroup rules inside an
+      # unprivileged LXC). Add a line per card when a GPU is added.
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidia1:/dev/nvidia1
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8090/api/health',timeout=5)"]
+      interval: 1m
+      timeout: 10s
+
 volumes:
   caddy_data:
   caddy_config:
+  broker_data:

@@ -25,6 +25,11 @@
 	}
 	redir /forager /forager/ 301
 
+	# GPU broker + host monitor (the broker container on the compose network)
+	handle_path /host/* {
+		reverse_proxy broker:8090
+	}
+
 	# The portal itself: static shell + vendored font
 	handle {
 		root * /srv
