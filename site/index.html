@@ -63,7 +63,7 @@ table.st th:first-child,table.st td:first-child,table.st th.l,table.st td.l{text
 </div></header>
 <div id="stage">
 <iframe id="f-keying" title="DCMP Keying Pipeline" hidden></iframe>
-<iframe id="f-forager" title="Media Forager" hidden></iframe>
+<iframe id="f-forager" title="DCMP Media Forager" hidden></iframe>
 <div id="host" hidden><div class="in">
 <h2 class="sec">Right now <span class="t" id="livenote"></span></h2>
 <div class="apps" id="apps"></div>
@@ -73,7 +73,7 @@ table.st th:first-child,table.st td:first-child,table.st th.l,table.st td.l{text
 </div>
 <script>
 const APPS={keying:{name:"DCMP Keying Pipeline",base:"/keying",desc:"Drop a clip into a watch folder; a keyed ProRes 4444 export lands in alpha_export."},
-            forager:{name:"Media Forager",base:"/forager",desc:"Download licensed YouTube content and deliver Flip64-ready files to the Vantage watch folder."},
+            forager:{name:"DCMP Media Forager",base:"/forager",desc:"Download licensed YouTube content and deliver Flip64-ready files to the Vantage watch folder."},
             host:{name:"Host",desc:"CPU, GPUs and temperatures of the machine both apps run on, and what is on each card."}};
 const FORAGER_GPU=0;                        // the card forager encodes on (it only sees /dev/nvidia0 = the RTX 3060)
 const $=s=>document.querySelector(s);
