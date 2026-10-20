@@ -1,4 +1,4 @@
-# DCMP Media portal
+# DCMP Media Processing — the portal
 
 One address for the DCMP Keying Pipeline, Media Forager and the machine they share. A single Caddy container
 serves the shell (`site/index.html`) and reverse-proxies the two apps:

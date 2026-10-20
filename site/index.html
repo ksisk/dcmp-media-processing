@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DCMP Media</title>
+<title>DCMP Media Processing</title>
 <style>
 @font-face{font-family:"Atkinson Hyperlegible";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/atkinson-400.woff2) format("woff2")}
 @font-face{font-family:"Atkinson Hyperlegible";font-weight:700;font-style:normal;font-display:swap;src:url(/fonts/atkinson-700.woff2) format("woff2")}
@@ -19,10 +19,10 @@ header .in{max-width:1180px;margin:0 auto}
 header .ttl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 header h1{font-size:30px;line-height:1.1;margin:0;letter-spacing:-0.01em}
 header p{margin:6px 0 0;color:var(--muted);max-width:70ch}
-.tabs{display:flex;gap:4px;margin:12px 0 0;flex-wrap:wrap;align-items:center}
-.tabs a{color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;padding:8px 14px;font-weight:700;margin-bottom:-1px}
-.tabs a.on{color:var(--ink);border-bottom-color:var(--accent)}.tabs a:hover{color:var(--ink)}
-.tabs .sp{flex:1}.tabs .ext{font-size:14px;font-weight:400;color:var(--muted);padding-bottom:6px}.tabs .ext a{padding:0;margin:0;border:0;font-weight:700;color:var(--accent)}
+.tabs{display:flex;gap:6px;margin:14px 0 12px;flex-wrap:wrap;align-items:center}
+.tabs a{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-weight:700;background:var(--paper)}
+.tabs a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.tabs a:hover:not(.on){color:var(--ink);border-color:var(--muted)}
+.tabs .sp{flex:1}.tabs .ext{font-size:14px;font-weight:400;color:var(--muted)}.tabs .ext a{padding:0;margin:0;border:0;background:none;font-weight:700;color:var(--accent)}.tabs .ext a:hover{text-decoration:underline;color:var(--accent)}
 #stage{flex:1;min-height:0;position:relative}
 #stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--ground)}
 #host{position:absolute;inset:0;overflow:auto}
@@ -71,7 +71,7 @@ table.pol input.w{width:54px;font-weight:700;font-size:16px}table.pol input.w.of
 </head>
 <body>
 <header><div class="in">
-<div class="ttl"><h1>DCMP Media</h1></div>
+<div class="ttl"><h1>DCMP Media Processing</h1></div>
 <p id="desc">The keying pipeline, Media Forager and the machine they share, in one place.</p>
 <nav class="tabs" id="tabs">
 <a href="#keying" data-tab="keying">Keying</a><a href="#forager" data-tab="forager">Forager</a><a href="#host" data-tab="host">Host</a>
