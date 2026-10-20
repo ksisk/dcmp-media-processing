@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCMP Media</title>
+<style>
+@font-face{font-family:"Atkinson Hyperlegible";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/atkinson-400.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible";font-weight:700;font-style:normal;font-display:swap;src:url(/fonts/atkinson-700.woff2) format("woff2")}
+:root{color-scheme:light;--ink:#17242f;--muted:#5b6b78;--line:#d5dde3;--paper:#ffffff;--ground:#eef2f4;--accent:#0d6b70;--accent-ink:#ffffff;
+ --done:#2f7d3b;--fail:#b3261e;--wait:#8a6d00;--track:#dfe6ea;--vram:#6b4fa3}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--ink:#e4ebef;--muted:#9aabb6;--line:#2f3d47;--paper:#1a252d;--ground:#121b21;--accent:#4fb3b8;--accent-ink:#0b1a1c;
+ --done:#6cc47a;--fail:#f08a82;--wait:#e0c050;--track:#2a3740;--vram:#b39ddb}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
+header{padding:22px 24px 0;flex:none;border-bottom:1px solid var(--line);background:var(--ground)}
+header .in{max-width:1180px;margin:0 auto}
+header .ttl{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+header h1{font-size:30px;line-height:1.1;margin:0;letter-spacing:-0.01em}
+header p{margin:6px 0 0;color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:4px;margin:12px 0 0;flex-wrap:wrap;align-items:center}
+.tabs a{color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;padding:8px 14px;font-weight:700;margin-bottom:-1px}
+.tabs a.on{color:var(--ink);border-bottom-color:var(--accent)}.tabs a:hover{color:var(--ink)}
+.tabs .sp{flex:1}.tabs .ext{font-size:14px;font-weight:400;color:var(--muted);padding-bottom:6px}.tabs .ext a{padding:0;margin:0;border:0;font-weight:700;color:var(--accent)}
+#stage{flex:1;min-height:0;position:relative}
+#stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--ground)}
+#host{position:absolute;inset:0;overflow:auto}
+#host .in{max-width:1180px;margin:0 auto;padding:18px 24px 60px}
+h2.sec{font-size:20px;margin:22px 0 10px}h2.sec:first-child{margin-top:4px}h2.sec .t{color:var(--muted);font-weight:400;font-size:14px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+.bar{height:7px;background:var(--track);border-radius:2px;overflow:hidden;position:relative}.bar>i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
+.bar.hot>i{background:var(--wait)}.bar.vr>i{background:var(--vram)}
+.live{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px}
+.live .lc{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+.live .lc .k{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}.live .lc .k b{color:var(--ink);font-weight:700}
+.live .lc .v{font-size:26px;font-weight:700;margin:2px 0 8px;line-height:1.15;font-variant-numeric:tabular-nums}.live .lc .v small{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
+.live .m{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;margin-top:10px}
+.live svg{display:block;width:100%;height:46px;margin-top:8px}.live .cores{display:grid;grid-template-columns:repeat(auto-fill,minmax(22px,1fr));gap:3px;margin-top:10px}
+.live .cores div{height:34px;background:var(--track);border-radius:3px;position:relative;overflow:hidden}.live .cores div i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);transition:height .5s}
+.live .cores div.hot i{background:var(--wait)}.live .cores div::after{content:attr(data-c);position:absolute;top:1px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted)}
+.live .temps{margin-top:6px}.live .tr{display:grid;grid-template-columns:minmax(130px,1.4fr) 2fr 52px;gap:8px;align-items:center;font-size:13.5px;padding:3px 0}
+.live .tr .tn{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live .tr .tv{text-align:right;font-variant-numeric:tabular-nums}
+table.st{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums}table.st th,table.st td{text-align:right;padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+table.st th:first-child,table.st td:first-child,table.st th.l,table.st td.l{text-align:left}table.st thead th{color:var(--muted);font-weight:700;font-size:13.5px}table.st tr:last-child td{border-bottom:0}
+.who{display:block}.who.k::before{content:"Keying · ";color:var(--muted)}.who.f::before{content:"Forager · ";color:var(--muted)}.t{color:var(--muted)}
+.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:12px}
+.apps .ac{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px 18px}.apps .ac b{font-size:17px}.apps .ac .s{color:var(--muted);font-size:14px;margin-top:4px}
+.apps .ac .n{font-size:26px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}.apps .ac .n small{font-size:13px;color:var(--muted);font-weight:400;margin-left:6px}
+.apps .ac a{color:var(--accent);font-weight:700;text-decoration:none;font-size:14px}.apps .ac a:hover{text-decoration:underline}
+@media(max-width:560px){header{padding:16px 16px 0}header h1{font-size:24px}#host .in{padding:14px 16px 60px}}
+</style>
+</head>
+<body>
+<header><div class="in">
+<div class="ttl"><h1>DCMP Media</h1></div>
+<p id="desc">The keying pipeline, Media Forager and the machine they share, in one place.</p>
+<nav class="tabs" id="tabs">
+<a href="#keying" data-tab="keying">Keying</a><a href="#forager" data-tab="forager">Forager</a><a href="#host" data-tab="host">Host</a>
+<span class="sp"></span><span class="ext" id="ext"></span>
+</nav>
+</div></header>
+<div id="stage">
+<iframe id="f-keying" title="DCMP Keying Pipeline" hidden></iframe>
+<iframe id="f-forager" title="Media Forager" hidden></iframe>
+<div id="host" hidden><div class="in">
+<h2 class="sec">Right now <span class="t" id="livenote"></span></h2>
+<div class="apps" id="apps"></div>
+<div class="live" id="live"><div class="empty" style="padding:18px 0">collecting…</div></div>
+<h2 class="sec">GPUs <span class="t" id="gpunote"></span></h2><div class="card"><table class="st" id="gpus"></table></div>
+</div></div>
+</div>
+<script>
+const APPS={keying:{name:"DCMP Keying Pipeline",base:"/keying",desc:"Drop a clip into a watch folder; a keyed ProRes 4444 export lands in alpha_export."},
+            forager:{name:"Media Forager",base:"/forager",desc:"Download licensed YouTube content and deliver Flip64-ready files to the Vantage watch folder."},
+            host:{name:"Host",desc:"CPU, GPUs and temperatures of the machine both apps run on, and what is on each card."}};
+const FORAGER_GPU=0;                        // the card forager encodes on (it only sees /dev/nvidia0 = the RTX 3060)
+const $=s=>document.querySelector(s);
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function parseHash(){const m=location.hash.match(/^#(keying|forager|host)(\/.*)?$/);return m?{tab:m[1],path:m[2]||"/"}:{tab:"keying",path:"/"}}
+let cur=null;
+function show(tab,path){
+  cur=tab;document.querySelectorAll(".tabs a[data-tab]").forEach(a=>a.classList.toggle("on",a.dataset.tab===tab));
+  $("#desc").textContent=APPS[tab].desc;
+  for(const k of ["keying","forager"]){const f=document.getElementById("f-"+k);const on=k===tab;f.hidden=!on;
+    if(on){const want=APPS[k].base+(path||"/");const sep=want.includes("?")?"&":"?";
+      if(!f.dataset.loaded){f.src=want+sep+"embed=1";f.dataset.loaded="1"}
+      else{try{const cp=f.contentWindow.location.pathname+f.contentWindow.location.search.replace(/[?&]embed=1/,"").replace(/^&/,"?");if(path&&path!=="/"&&cp!==want)f.contentWindow.location.href=want+sep+"embed=1"}catch(e){}}}}
+  $("#host").hidden=tab!=="host";
+  $("#ext").innerHTML=tab==="host"?"":`<a href="${APPS[tab].base}/?embed=0" target="_blank" rel="noopener">open ${esc(APPS[tab].name)} on its own ↗</a>`;
+  if(tab==="host")tickHost();
+}
+window.addEventListener("hashchange",()=>{const h=parseHash();show(h.tab,h.path)});
+// keep the hash in step with where the user is inside the framed app, so refresh and bookmarks come back to the same page
+setInterval(()=>{if(cur!=="keying"&&cur!=="forager")return;const f=document.getElementById("f-"+cur);try{const l=f.contentWindow.location;if(!l||l.href==="about:blank")return;
+  let p=l.pathname;if(p.startsWith(APPS[cur].base))p=p.slice(APPS[cur].base.length)||"/";const q=l.search.replace(/[?&]embed=[01]/,"").replace(/^&/,"?");const want="#"+cur+(p==="/"&&!q&&!l.hash?"":p+q+l.hash);
+  if(location.hash!==want)history.replaceState(null,"",want)}catch(e){}},1000);
+
+// ---- Host tab
+const ACC=v=>getComputedStyle(document.documentElement).getPropertyValue(v||"--accent").trim();
+function spark(rows,color){if(rows.length<2)return"";const w=300,h=46,n=rows.length;const pts=rows.map((v,i)=>`${(i/(n-1)*w).toFixed(1)},${(h-2-(Math.max(0,Math.min(100,v??0))/100)*(h-4)).toFixed(1)}`);
+  return`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="M${pts.join(" L")}" fill="none" stroke="${color}" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M0,${h} L${pts.join(" L")} L${w},${h} Z" fill="${color}" opacity=".12"/></svg>`}
+function liveBar(v,cls){const p=Math.max(0,Math.min(100,v??0));return`<div class="bar ${cls||""} ${p>=85?"hot":""}"><i style="width:${p}%"></i></div>`}
+let foragerAuth=true,foragerJobs=null,keyingJobs=null;
+async function j(url){const r=await fetch(url,{cache:"no-store"});if(r.status===401){throw Object.assign(new Error("401"),{auth:true})}if(!r.ok)throw new Error(r.status);return r.json()}
+async function loadLive(){try{const L=await j("/keying/api/live");const el=$("#live"),note=$("#livenote");if(!L.latest)return;const s=L.latest,H=L.hist;const span=H.length*L.interval;note.textContent=`every ${L.interval}s · last ${span<90?span+" s":Math.round(span/60)+" min"}`;let h="";
+  h+=`<div class="lc"><div class="k"><b>CPU</b><span>${s.cores.length} cores${s.load1!=null?` · load ${s.load1.toFixed(2)}`:""}${s.cpu_temp!=null?` · ${s.cpu_temp.toFixed(0)} °C`:""}</span></div><div class="v">${s.cpu==null?"–":s.cpu.toFixed(0)+"%"}</div>${liveBar(s.cpu)}${spark(H.map(x=>x.cpu),ACC())}
+    <div class="cores">${s.cores.map((c,i)=>`<div class="${(c??0)>=85?"hot":""}" data-c="${i}" title="core ${i}: ${c==null?"–":c.toFixed(0)+"%"}"><i style="height:${Math.max(0,Math.min(100,c??0))}%"></i></div>`).join("")}</div></div>`;
+  s.gpus.forEach((g,gi)=>{const vr=g.mem_total?100*(g.mem_used||0)/g.mem_total:0;
+    h+=`<div class="lc"><div class="k"><b>GPU ${g.index} · ${esc(g.short)}</b><span>${g.temp!=null?g.temp.toFixed(0)+" °C":""}${g.power!=null?` · ${g.power.toFixed(0)} W`:""}</span></div>
+      <div class="v">${g.util==null?"–":g.util+"%"}<small>load</small></div>${liveBar(g.util)}${spark(H.map(x=>x.gpu[gi]),ACC())}
+      <div class="m"><span>VRAM</span><span>${((g.mem_used||0)/1024).toFixed(1)} / ${(g.mem_total/1024).toFixed(0)} GB · ${vr.toFixed(0)}%</span></div>${liveBar(vr,"vr")}${spark(H.map(x=>x.vram[gi]),ACC("--vram"))}</div>`});
+  const tp=[];if(s.cpu_temp!=null)tp.push({n:"CPU",t:s.cpu_temp});s.gpus.forEach(g=>{if(g.temp!=null)tp.push({n:`GPU ${g.index} · ${g.short}`,t:g.temp})});
+  const seen=new Set(tp.map(x=>x.n));(s.temps||[]).forEach(x=>{if(["coretemp","k10temp","zenpower","x86_pkg_temp","cpu_thermal"].includes(x.chip)&&s.cpu_temp!=null)return;const n=`${x.chip} ${x.label}`.replace(/^thermal /,"");if(!seen.has(n)){seen.add(n);tp.push({n,t:x.temp})}});
+  if(tp.length)h+=`<div class="lc"><div class="k"><b>Temperatures</b><span>system · CPU · GPU</span></div><div class="temps">${tp.map(x=>`<div class="tr"><span class="tn" title="${esc(x.n)}">${esc(x.n)}</span><div class="bar ${x.t>=80?"hot":""}"><i style="width:${Math.max(0,Math.min(100,x.t))}%"></i></div><span class="tv">${x.t.toFixed(0)} °C</span></div>`).join("")}</div></div>`;
+  el.innerHTML=h}catch(e){$("#live").innerHTML=`<div class="empty">keying pipeline not reachable (${esc(e.message)})</div>`}}
+async function loadForager(){try{const r=await j("/forager/api/jobs?view=queue&page=1&per=50");foragerJobs=r.jobs||r.items||(Array.isArray(r)?r:[]);foragerAuth=true}catch(e){if(e.auth){foragerAuth=false}foragerJobs=null}}
+async function loadKeying(){try{const r=await j("/keying/api/jobs");keyingJobs=r.jobs||[];var queued=r.queued||[]}catch(e){keyingJobs=null}
+  return queued||[]}
+function stageName(st){return{download:"Downloading",analyse:"Measuring loudness",pass1:"Video pass 1",pass2:"Encoding",deliver:"Delivering"}[st]||"Working"}
+async function loadGpus(){try{const G=await j("/keying/api/gpus");const el=$("#gpus"),note=$("#gpunote");
+  if(!G.available){el.innerHTML=`<tbody><tr><td class="t">nvidia-smi is not available in the keying container</td></tr></tbody>`;return}
+  const fr=(foragerJobs||[]).filter(x=>x.status==="running");
+  note.textContent=`${G.gpus.length} card${G.gpus.length===1?"":"s"} · keying places each job on the least busy card; forager encodes on GPU ${FORAGER_GPU}`;
+  el.innerHTML=`<thead><tr><th>#</th><th class="l">Card</th><th>Load</th><th>VRAM</th><th>Power</th><th>Temp</th><th class="l">Running here</th></tr></thead><tbody>${G.gpus.map(g=>{
+    const who=[...g.jobs.map(x=>`<span class="who k">${esc(x)}</span>`),...(g.index===FORAGER_GPU?fr.map(x=>`<span class="who f">${esc(x.title||x.url||x.id)} <span class="t">${esc(stageName(x.stage))} ${Math.round((x.progress||0)*100)}%</span></span>`):[])];
+    if(g.index===FORAGER_GPU&&!foragerAuth)who.push(`<span class="t">forager: sign in on the Forager tab to see its jobs</span>`);
+    return`<tr><td>${g.index}</td><td class="l">${esc(g.short)} <span class="t" style="font-size:11px">${esc(g.uuid)}</span></td><td>${g.util==null?"–":g.util+"%"}</td><td>${g.mem_used==null?"–":`${(g.mem_used/1024).toFixed(1)} / ${(g.mem_total/1024).toFixed(0)} GB`}</td><td>${g.power==null?"–":g.power.toFixed(0)+" W"}</td><td>${g.temp==null?"–":g.temp.toFixed(0)+" °C"}</td><td class="l">${who.length?who.join(""):`<span class="t">idle</span>`}</td></tr>`}).join("")}</tbody>`}catch(e){$("#gpus").innerHTML=`<tbody><tr><td class="t">keying pipeline not reachable</td></tr></tbody>`}}
+function renderApps(queued){const kj=keyingJobs||[];const run=kj.filter(x=>x.state==="running").length,wait=kj.filter(x=>["waiting","decision"].includes(x.state)).length,rev=kj.filter(x=>x.state==="review").length;
+  const fj=foragerJobs;const frun=fj?fj.filter(x=>x.status==="running").length:null,fq=fj?fj.filter(x=>x.status==="queued").length:null;
+  $("#apps").innerHTML=`<div class="ac"><b>Keying pipeline</b><div class="s">${keyingJobs?`${run} running · ${queued.length} queued · ${wait} waiting · ${rev} to review`:"not reachable"}</div><div class="n">${keyingJobs?run:"–"}<small>keying now</small></div><a href="#keying">Open Keying →</a></div>
+    <div class="ac"><b>Media Forager</b><div class="s">${fj?`${frun} working · ${fq} queued`:foragerAuth?"not reachable":"sign in on the Forager tab to see its queue"}</div><div class="n">${fj?frun:"–"}<small>downloading or encoding</small></div><a href="#forager">Open Forager →</a></div>`}
+let hostTimer=null;
+async function tickHost(){if($("#host").hidden)return;const q=await loadKeying();await loadForager();renderApps(q);await Promise.all([loadLive(),loadGpus()]);clearTimeout(hostTimer);hostTimer=setTimeout(tickHost,2000)}
+const h0=parseHash();show(h0.tab,h0.path);
+</script>
+</body>
+</html>
