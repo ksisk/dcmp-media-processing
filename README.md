@@ -49,4 +49,4 @@ cp .env.example .env            # upstream addresses, broker port, time zone
 docker compose up -d
 ```
 
-Runs in LXC 600 `dashboard` on sisk-pm-01 at http://192.168.25.30/. No login — LAN/VPN only.
+Runs in LXC 600 `dashboard` on sisk-pm-01 at http://192.168.2.121/. No login — DCMP office LAN only.
