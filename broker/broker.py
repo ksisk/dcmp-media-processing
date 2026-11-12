@@ -52,15 +52,16 @@ def short_name(name):
 
 def _number_twins(gpus):
     """Cards of the same model get a number so they can be told apart on the status pages and in the logs:
-    two 'RTX 5070 Ti' become '5070ti_01' and '5070ti_02' (in index order). A model that appears once keeps its name."""
+    two 'RTX 5070 Ti' at index 0 and 1 become '5070ti_00' and '5070ti_01' - the number is the card's nvidia-smi
+    index, so it matches "GPU 0" / "GPU 1" everywhere else. A model that appears once keeps its name."""
     same = {}
     for g in gpus:
         same.setdefault(g["short"], []).append(g)
     for short, cards in same.items():
         if len(cards) > 1:
             base = short.replace("RTX", "").replace("GTX", "").replace(" ", "").lower()
-            for n, g in enumerate(sorted(cards, key=lambda c: (c["index"] is None, c["index"] or 0)), 1):
-                g["short"] = f"{base}_{n:02d}"
+            for n, g in enumerate(cards):
+                g["short"] = f"{base}_{g['index'] if g['index'] is not None else n:02d}"
     return gpus
 
 
