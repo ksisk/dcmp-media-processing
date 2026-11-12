@@ -50,6 +50,20 @@ def short_name(name):
     return " ".join(n.split()) or (name or "GPU")
 
 
+def _number_twins(gpus):
+    """Cards of the same model get a number so they can be told apart on the status pages and in the logs:
+    two 'RTX 5070 Ti' become '5070ti_01' and '5070ti_02' (in index order). A model that appears once keeps its name."""
+    same = {}
+    for g in gpus:
+        same.setdefault(g["short"], []).append(g)
+    for short, cards in same.items():
+        if len(cards) > 1:
+            base = short.replace("RTX", "").replace("GTX", "").replace(" ", "").lower()
+            for n, g in enumerate(sorted(cards, key=lambda c: (c["index"] is None, c["index"] or 0)), 1):
+                g["short"] = f"{base}_{n:02d}"
+    return gpus
+
+
 def list_gpus(timeout=10):
     """Every card nvidia-smi can see, or None when nvidia-smi is missing or failing."""
     try:
@@ -72,7 +86,7 @@ def list_gpus(timeout=10):
                      "mem_total": num(parts[3], int), "mem_free": num(parts[4], int), "mem_used": num(parts[5], int),
                      "util": num(parts[6], int), "temp": num(parts[7]) if len(parts) > 7 else None,
                      "power": num(parts[8]) if len(parts) > 8 else None})
-    return gpus
+    return _number_twins(gpus)
 
 
 # ----------------------------------------------------------------------------- policy
