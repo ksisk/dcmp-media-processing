@@ -39,6 +39,7 @@ services:
       - /dev/nvidia0:/dev/nvidia0
       - /dev/nvidia1:/dev/nvidia1
       - /dev/nvidia2:/dev/nvidia2
+      - /dev/nvidia3:/dev/nvidia3
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:8090/api/health',timeout=5)"]
       interval: 1m
